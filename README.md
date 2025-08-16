@@ -1,5 +1,3 @@
-Got you 😎 here’s a polished **GitHub-style README.md** for your **TreasureHunt plugin**, formatted for open-source or public repo use:
-
 ---
 
 # 🗺️ TreasureHunt Plugin
