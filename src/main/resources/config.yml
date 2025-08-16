@@ -1,0 +1,189 @@
+# TreasureHunt Configuration
+
+# Chest spawning settings
+chest-spawn:
+  # Whether to automatically spawn chests on a timer
+  auto-spawn: true
+  # Interval in minutes between chest spawns (if auto-spawn is enabled)
+  interval: 30
+  # Number of chests to spawn each time
+  count: 3
+  # Maximum number of chests that can exist at once
+  max-chests: 10
+  # Whether chests should despawn if not looted
+  despawn-enabled: true
+  # Time in minutes before unlooted chests despawn
+  despawn-time: 60
+  # Worlds where chests can spawn
+  enabled-worlds:
+    - world
+    - world_nether
+    - world_the_end
+  # Minimum distance from spawn point (in blocks)
+  min-distance: 100
+  # Maximum distance from spawn point (in blocks)
+  max-distance: 2000
+  # Minimum Y level for chest spawning
+  min-y: 40
+  # Maximum Y level for chest spawning
+  max-y: 120
+  # Whether chests should only spawn on solid blocks
+  require-solid-ground: true
+
+# Loot settings
+loot:
+  # Loot table tiers and their probabilities
+  tiers:
+    common:
+      chance: 60
+      min-items: 2
+      max-items: 5
+    uncommon:
+      chance: 30
+      min-items: 3
+      max-items: 6
+    rare:
+      chance: 8
+      min-items: 4
+      max-items: 7
+    epic:
+      chance: 2
+      min-items: 5
+      max-items: 8
+  
+  # Whether to include vanilla loot tables
+  use-vanilla-loot: true
+  
+  # Custom loot items and their chances (per tier)
+  items:
+    common:
+      - item: IRON_INGOT
+        amount: 1-3
+        chance: 50
+      - item: COAL
+        amount: 2-5
+        chance: 70
+      - item: BREAD
+        amount: 1-3
+        chance: 60
+    uncommon:
+      - item: GOLD_INGOT
+        amount: 1-3
+        chance: 50
+      - item: IRON_SWORD
+        amount: 1
+        chance: 40
+        enchantments:
+          - type: SHARPNESS
+            level: 1-2
+            chance: 50
+      - item: IRON_HELMET
+        amount: 1
+        chance: 30
+    rare:
+      - item: DIAMOND
+        amount: 1-2
+        chance: 40
+      - item: GOLDEN_APPLE
+        amount: 1
+        chance: 30
+      - item: EXPERIENCE_BOTTLE
+        amount: 3-6
+        chance: 50
+    epic:
+      - item: NETHERITE_SCRAP
+        amount: 1
+        chance: 30
+      - item: ENCHANTED_GOLDEN_APPLE
+        amount: 1
+        chance: 20
+      - item: DIAMOND_SWORD
+        amount: 1
+        chance: 40
+        enchantments:
+          - type: SHARPNESS
+            level: 3-4
+            chance: 70
+          - type: LOOTING
+            level: 2-3
+            chance: 50
+
+# Notification settings
+notifications:
+  # Whether to broadcast when chests spawn
+  broadcast-spawn: true
+  # Whether to show countdown messages
+  show-countdown: true
+  # Countdown intervals in minutes
+  countdown-times:
+    - 10
+    - 5
+    - 1
+  # Messages
+  messages:
+    spawn: "&6[TreasureHunt] &eTreasure chests have appeared in the world! Find them before others do!"
+    spawn-location-hint: "&6[TreasureHunt] &eA treasure chest has appeared near %location%!"
+    countdown: "&6[TreasureHunt] &eTreasure chests will appear in %time% minutes!"
+    chest-found: "&6[TreasureHunt] &e%player% found a treasure chest!"
+    chest-despawn: "&6[TreasureHunt] &cAll unclaimed treasure chests have despawned!"
+
+# Command settings
+commands:
+  # Cooldown for the locate command in seconds
+  locate-cooldown: 300
+  # Whether to apply a penalty for using the locate command
+  locate-penalty: true
+  # Penalty options (only applied if locate-penalty is true)
+  locate-penalty-options:
+    # Reduce loot quality when chest is found after using locate
+    reduce-loot-quality: true
+    # Broadcast to other players that someone used locate
+    broadcast-usage: true
+
+# Guard settings
+guards:
+  # Whether to spawn guards/traps at chest locations
+  enabled: true
+  # Chance (0-100) that a chest will have a guard
+  chance: 50
+  # Types of guards and their chances
+  types:
+    - type: ZOMBIE
+      chance: 40
+      count: 1-2
+      equipment:
+        helmet: IRON_HELMET
+        chestplate: IRON_CHESTPLATE
+    - type: SKELETON
+      chance: 30
+      count: 1
+      equipment:
+        helmet: LEATHER_HELMET
+        bow-enchantments:
+          - type: POWER
+            level: 1-2
+    - type: CREEPER
+      chance: 20
+      count: 1
+    - type: TRAP
+      chance: 10
+      trap-type: POISON
+      duration: 5
+
+# Storage settings
+storage:
+  # Storage type: YAML or MYSQL
+  type: YAML
+  # MySQL settings (only used if type is MYSQL)
+  mysql:
+    host: localhost
+    port: 3306
+    database: treasurehunt
+    username: root
+    password: password
+    table-prefix: th_
+
+# Debug settings
+debug:
+  enabled: false
+  log-level: INFO

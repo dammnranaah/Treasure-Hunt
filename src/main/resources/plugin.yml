@@ -1,0 +1,44 @@
+name: TreasureHunt
+version: '${project.version}'
+main: com.dammnranaah.treasurehunt.TreasureHunt
+api-version: '1.19'
+authors: [dammnranaah]
+description: A plugin that randomly spawns loot chests around the world for players to discover
+commands:
+  treasurehunt:
+    description: Main command for the TreasureHunt plugin
+    usage: |
+      §6TreasureHunt Commands:
+      §e/<command> start §7- Starts automatic chest spawning
+      §e/<command> stop §7- Stops automatic chest spawning
+      §e/<command> reload §7- Reloads the plugin configuration
+      §e/<command> locate §7- Locates the nearest treasure chest
+      §e/<command> help §7- Shows this help message
+    permission: treasurehunt.command
+    aliases: [th]
+permissions:
+  treasurehunt.command:
+    description: Base permission for using the plugin commands
+    default: true
+    children:
+      treasurehunt.locate: true
+  treasurehunt.admin:
+    description: Allows access to admin commands (start, stop, reload)
+    default: op
+    children:
+      treasurehunt.command: true
+      treasurehunt.start: true
+      treasurehunt.stop: true
+      treasurehunt.reload: true
+  treasurehunt.start:
+    description: Allows starting automatic chest spawning
+    default: op
+  treasurehunt.stop:
+    description: Allows stopping automatic chest spawning
+    default: op
+  treasurehunt.reload:
+    description: Allows reloading the plugin configuration
+    default: op
+  treasurehunt.locate:
+    description: Allows players to locate treasure chests
+    default: true
