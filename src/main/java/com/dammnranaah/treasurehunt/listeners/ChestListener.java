@@ -26,10 +26,7 @@ public class ChestListener implements Listener {
         this.plugin = plugin;
     }
 
-    /**
-     * Handle chest open events
-     * @param event InventoryOpenEvent
-     */
+
     @EventHandler(priority = EventPriority.NORMAL)
     public void onInventoryOpen(InventoryOpenEvent event) {
         if (!(event.getPlayer() instanceof Player)) {
@@ -45,17 +42,17 @@ public class ChestListener implements Listener {
             TreasureChest treasureChest = plugin.getChestManager().getChestAt(block.getLocation());
 
             if (treasureChest != null && !treasureChest.isLooted()) {
-                // Mark the chest as looted
+
                 treasureChest.setLooted(true);
 
-                // Broadcast chest found message if enabled
+
                 if (plugin.getConfigManager().isBroadcastSpawnEnabled()) {
                     String message = plugin.getConfigManager().getMessage("chest-found")
                             .replace("%player%", player.getName());
                     Bukkit.broadcastMessage(message);
                 }
 
-                // Log the event
+
                 plugin.getLogger().info(player.getName() + " found a treasure chest at " + 
                         block.getLocation().getWorld().getName() + " " + 
                         block.getLocation().getBlockX() + " " + 
@@ -65,10 +62,7 @@ public class ChestListener implements Listener {
         }
     }
 
-    /**
-     * Handle chest close events
-     * @param event InventoryCloseEvent
-     */
+
     @EventHandler(priority = EventPriority.NORMAL)
     public void onInventoryClose(InventoryCloseEvent event) {
         if (!(event.getPlayer() instanceof Player)) {
@@ -83,7 +77,7 @@ public class ChestListener implements Listener {
             TreasureChest treasureChest = plugin.getChestManager().getChestAt(block.getLocation());
 
             if (treasureChest != null && treasureChest.isLooted()) {
-                // Check if the chest is empty
+
                 boolean isEmpty = true;
                 for (int i = 0; i < event.getInventory().getSize(); i++) {
                     if (event.getInventory().getItem(i) != null) {
@@ -92,20 +86,17 @@ public class ChestListener implements Listener {
                     }
                 }
 
-                // Remove the chest if it's empty
+
                 if (isEmpty) {
                     Bukkit.getScheduler().runTaskLater(plugin, () -> {
                         plugin.getChestManager().removeChest(treasureChest.getId());
-                    }, 20L); // Remove after 1 second
+                    }, 20L);
                 }
             }
         }
     }
 
-    /**
-     * Prevent breaking treasure chests
-     * @param event BlockBreakEvent
-     */
+
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         Block block = event.getBlock();
@@ -114,12 +105,12 @@ public class ChestListener implements Listener {
             TreasureChest treasureChest = plugin.getChestManager().getChestAt(block.getLocation());
 
             if (treasureChest != null) {
-                // Only allow breaking if the player has admin permission
+
                 if (!event.getPlayer().hasPermission("treasurehunt.admin")) {
                     event.setCancelled(true);
                     event.getPlayer().sendMessage(ChatColor.RED + "You cannot break treasure chests!");
                 } else {
-                    // Admin is breaking the chest, remove it from the manager
+
                     plugin.getChestManager().removeChest(treasureChest.getId());
                     event.getPlayer().sendMessage(ChatColor.YELLOW + "Treasure chest removed.");
                 }
@@ -127,10 +118,7 @@ public class ChestListener implements Listener {
         }
     }
 
-    /**
-     * Handle player interact events for chest protection
-     * @param event PlayerInteractEvent
-     */
+
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onPlayerInteract(PlayerInteractEvent event) {
         Block block = event.getClickedBlock();
@@ -139,8 +127,7 @@ public class ChestListener implements Listener {
             TreasureChest treasureChest = plugin.getChestManager().getChestAt(block.getLocation());
 
             if (treasureChest != null) {
-                // Allow interaction for all players (no need to cancel the event)
-                // This is just a hook for potential future features
+
             }
         }
     }

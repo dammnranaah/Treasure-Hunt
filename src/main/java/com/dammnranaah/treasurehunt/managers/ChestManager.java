@@ -34,9 +34,6 @@ public class ChestManager {
         loadChests();
     }
 
-    /**
-     * Load chests from storage
-     */
     private void loadChests() {
         if (!chestsFile.exists()) {
             try {
@@ -71,9 +68,6 @@ public class ChestManager {
         }
     }
 
-    /**
-     * Save chests to storage
-     */
     public void saveChests() {
         chestsConfig.set("chests", null);
         
@@ -98,11 +92,6 @@ public class ChestManager {
         }
     }
 
-    /**
-     * Spawn treasure chests in the world
-     * @param count Number of chests to spawn
-     * @return Number of chests successfully spawned
-     */
     public int spawnChests(int count) {
         int maxChests = plugin.getConfigManager().getMaxChests();
         int currentChests = activeChests.size();
@@ -139,11 +128,6 @@ public class ChestManager {
         return spawned;
     }
 
-    /**
-     * Find a suitable location for a chest
-     * @param world World to search in
-     * @return Suitable location or null if none found
-     */
     private Location findSuitableLocation(World world) {
         int minDistance = plugin.getConfigManager().getMinDistance();
         int maxDistance = plugin.getConfigManager().getMaxDistance();
@@ -153,22 +137,18 @@ public class ChestManager {
         
         Location spawnPoint = world.getSpawnLocation();
         
-        // Try up to 50 times to find a suitable location
         for (int attempt = 0; attempt < 50; attempt++) {
-            // Generate random coordinates within the specified range
             double angle = ThreadLocalRandom.current().nextDouble() * 2 * Math.PI;
             double distance = minDistance + ThreadLocalRandom.current().nextDouble() * (maxDistance - minDistance);
             
             int x = (int) (spawnPoint.getX() + distance * Math.cos(angle));
             int z = (int) (spawnPoint.getZ() + distance * Math.sin(angle));
             
-            // Find a suitable Y coordinate
             int y = findSuitableY(world, x, z, minY, maxY, requireSolidGround);
             
             if (y != -1) {
                 Location location = new Location(world, x, y, z);
                 
-                // Check if the location is suitable for a chest
                 if (isSuitableForChest(location)) {
                     return location;
                 }
@@ -179,54 +159,35 @@ public class ChestManager {
         return null;
     }
 
-    /**
-     * Find a suitable Y coordinate for a chest
-     * @param world World to search in
-     * @param x X coordinate
-     * @param z Z coordinate
-     * @param minY Minimum Y coordinate
-     * @param maxY Maximum Y coordinate
-     * @param requireSolidGround Whether the chest must be placed on solid ground
-     * @return Suitable Y coordinate or -1 if none found
-     */
     private int findSuitableY(World world, int x, int z, int minY, int maxY, boolean requireSolidGround) {
         if (requireSolidGround) {
-            // Start from the top and work down to find solid ground
+
             for (int y = maxY; y >= minY; y--) {
                 Block block = world.getBlockAt(x, y, z);
                 Block blockAbove = world.getBlockAt(x, y + 1, z);
                 
                 if (block.getType().isSolid() && blockAbove.getType().isAir()) {
-                    return y + 1; // Place chest on top of solid block
+                    return y + 1;
                 }
             }
         } else {
-            // Just pick a random Y within the range
             return minY + ThreadLocalRandom.current().nextInt(maxY - minY + 1);
         }
         
         return -1;
     }
-
-    /**
-     * Check if a location is suitable for a chest
-     * @param location Location to check
-     * @return true if the location is suitable
-     */
     private boolean isSuitableForChest(Location location) {
         Block block = location.getBlock();
         
-        // Check if the block is air and can be replaced
         if (!block.getType().isAir()) {
             return false;
         }
         
-        // Check if there's enough space for a chest
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
                 Block nearbyBlock = location.clone().add(x, 0, z).getBlock();
                 if (nearbyBlock.getType() == Material.CHEST) {
-                    return false; // Don't place chests too close to each other
+                    return false; 
                 }
             }
         }
@@ -234,19 +195,13 @@ public class ChestManager {
         return true;
     }
 
-    /**
-     * Determine the tier of a chest based on configured probabilities
-     * @return Tier name
-     */
     private String determineTier() {
-        // Default tiers if not configured
         Map<String, Integer> tierChances = new HashMap<>();
         tierChances.put("common", 60);
         tierChances.put("uncommon", 30);
         tierChances.put("rare", 8);
         tierChances.put("epic", 2);
         
-        // Get tier chances from config
         if (plugin.getConfig().contains("loot.tiers")) {
             for (String tier : plugin.getConfig().getConfigurationSection("loot.tiers").getKeys(false)) {
                 int chance = plugin.getConfig().getInt("loot.tiers." + tier + ".chance", 0);
@@ -256,13 +211,10 @@ public class ChestManager {
             }
         }
         
-        // Calculate total chance
         int totalChance = tierChances.values().stream().mapToInt(Integer::intValue).sum();
         
-        // Generate a random number
         int random = ThreadLocalRandom.current().nextInt(totalChance);
         
-        // Determine tier based on random number
         int currentSum = 0;
         for (Map.Entry<String, Integer> entry : tierChances.entrySet()) {
             currentSum += entry.getValue();
@@ -271,16 +223,11 @@ public class ChestManager {
             }
         }
         
-        // Default to common if something goes wrong
+
         return "common";
     }
 
-    /**
-     * Spawn a chest at the given location
-     * @param location Location to spawn the chest
-     * @param tier Tier of the chest
-     * @return UUID of the spawned chest
-     */
+
     public UUID spawnChest(Location location, String tier) {
         Block block = location.getBlock();
         block.setType(Material.CHEST);
@@ -289,11 +236,11 @@ public class ChestManager {
         TreasureChest treasureChest = new TreasureChest(chestId, location, tier, System.currentTimeMillis());
         activeChests.put(chestId, treasureChest);
         
-        // Fill the chest with loot
+
         Chest chest = (Chest) block.getState();
         plugin.getLootManager().fillChest(chest.getInventory(), tier);
         
-        // Schedule despawn if enabled
+
         if (plugin.getConfigManager().isDespawnEnabled()) {
             int despawnTime = plugin.getConfigManager().getDespawnTime();
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
@@ -301,22 +248,19 @@ public class ChestManager {
                     removeChest(chestId);
                     plugin.getLogger().info("Treasure chest despawned due to timeout");
                     
-                    // Broadcast despawn message if configured
+
                     if (plugin.getConfigManager().isBroadcastSpawnEnabled()) {
                         Bukkit.broadcastMessage(plugin.getConfigManager().getMessage("chest-despawn"));
                     }
                 }
-            }, despawnTime * 20L * 60L); // Convert minutes to ticks
+            }, despawnTime * 20L * 60L);
         }
         
         plugin.getLogger().info("Spawned a " + tier + " treasure chest at " + LocationUtils.formatLocation(location));
         return chestId;
     }
 
-    /**
-     * Remove a chest from the world
-     * @param chestId UUID of the chest to remove
-     */
+
     public void removeChest(UUID chestId) {
         TreasureChest chest = activeChests.get(chestId);
         if (chest != null) {
@@ -331,11 +275,7 @@ public class ChestManager {
         }
     }
 
-    /**
-     * Get a chest by its location
-     * @param location Location to check
-     * @return TreasureChest at the location or null if none found
-     */
+
     public TreasureChest getChestAt(Location location) {
         for (TreasureChest chest : activeChests.values()) {
             if (LocationUtils.isSameBlock(chest.getLocation(), location)) {
@@ -345,11 +285,7 @@ public class ChestManager {
         return null;
     }
 
-    /**
-     * Get the nearest chest to a player
-     * @param player Player to check
-     * @return Nearest TreasureChest or null if none found
-     */
+
     public TreasureChest getNearestChest(Player player) {
         if (activeChests.isEmpty()) {
             return null;
@@ -360,7 +296,7 @@ public class ChestManager {
         double nearestDistance = Double.MAX_VALUE;
         
         for (TreasureChest chest : activeChests.values()) {
-            // Skip chests in different worlds
+
             if (!chest.getLocation().getWorld().equals(playerLocation.getWorld())) {
                 continue;
             }
@@ -375,17 +311,12 @@ public class ChestManager {
         return nearest;
     }
 
-    /**
-     * Get all active chests
-     * @return Map of active chests
-     */
+
     public Map<UUID, TreasureChest> getActiveChests() {
         return activeChests;
     }
 
-    /**
-     * Remove all active chests
-     */
+
     public void removeAllChests() {
         for (UUID chestId : new ArrayList<>(activeChests.keySet())) {
             removeChest(chestId);

@@ -4,9 +4,6 @@ import com.dammnranaah.treasurehunt.TreasureHunt;
 import org.bukkit.Bukkit;
 import org.bukkit.scheduler.BukkitRunnable;
 
-/**
- * Task to spawn treasure chests periodically
- */
 public class ChestSpawnTask extends BukkitRunnable {
 
     private final TreasureHunt plugin;
@@ -17,13 +14,10 @@ public class ChestSpawnTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        // Get the number of chests to spawn
         int chestCount = plugin.getConfigManager().getChestCount();
         
-        // Spawn the chests
         int spawned = plugin.getChestManager().spawnChests(chestCount);
         
-        // Send notifications if enabled
         if (spawned > 0 && plugin.getConfigManager().isBroadcastSpawnEnabled()) {
             Bukkit.broadcastMessage(plugin.getConfigManager().getMessage("spawn"));
         }
@@ -31,9 +25,6 @@ public class ChestSpawnTask extends BukkitRunnable {
         plugin.getLogger().info("Spawned " + spawned + " treasure chests");
     }
     
-    /**
-     * Schedule countdown notifications for the next spawn
-     */
     public void scheduleCountdowns() {
         if (!plugin.getConfigManager().isShowCountdownEnabled()) {
             return;
@@ -43,7 +34,7 @@ public class ChestSpawnTask extends BukkitRunnable {
         
         for (int countdown : plugin.getConfigManager().getCountdownTimes()) {
             if (countdown < interval) {
-                int delay = (interval - countdown) * 20 * 60; // Convert to ticks
+                int delay = (interval - countdown) * 20 * 60;
                 
                 Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     String message = plugin.getConfigManager().getMessage("countdown")

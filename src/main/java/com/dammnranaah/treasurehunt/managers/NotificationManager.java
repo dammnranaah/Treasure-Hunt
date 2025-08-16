@@ -11,9 +11,6 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Manages player notifications for the TreasureHunt plugin
- */
 public class NotificationManager {
 
     private final TreasureHunt plugin;
@@ -23,11 +20,6 @@ public class NotificationManager {
         this.plugin = plugin;
         this.countdownTasks = new HashMap<>();
     }
-
-    /**
-     * Send a notification to all players
-     * @param message Message to send
-     */
     public void broadcastMessage(String message) {
         if (message == null || message.isEmpty()) {
             return;
@@ -36,20 +28,14 @@ public class NotificationManager {
         Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', message));
     }
 
-    /**
-     * Send a notification about a chest spawn
-     * @param chest Spawned chest
-     * @param showLocation Whether to include location hint
-     */
     public void notifyChestSpawn(TreasureChest chest, boolean showLocation) {
         if (!plugin.getConfigManager().isBroadcastSpawnEnabled()) {
             return;
         }
         
-        // Send general spawn message
         broadcastMessage(plugin.getConfigManager().getMessage("spawn"));
         
-        // Send location hint if enabled
+
         if (showLocation && chest != null) {
             String areaName = LocationUtils.getAreaName(chest.getLocation());
             String message = plugin.getConfigManager().getMessage("spawn-location-hint")
@@ -59,11 +45,7 @@ public class NotificationManager {
         }
     }
 
-    /**
-     * Send a notification about a chest being found
-     * @param player Player who found the chest
-     * @param chest Chest that was found
-     */
+
     public void notifyChestFound(Player player, TreasureChest chest) {
         if (!plugin.getConfigManager().isBroadcastSpawnEnabled()) {
             return;
@@ -75,9 +57,7 @@ public class NotificationManager {
         broadcastMessage(message);
     }
 
-    /**
-     * Send a notification about chests despawning
-     */
+
     public void notifyChestDespawn() {
         if (!plugin.getConfigManager().isBroadcastSpawnEnabled()) {
             return;
@@ -86,22 +66,19 @@ public class NotificationManager {
         broadcastMessage(plugin.getConfigManager().getMessage("chest-despawn"));
     }
 
-    /**
-     * Schedule countdown notifications for the next chest spawn
-     * @param delayMinutes Minutes until the next spawn
-     */
+
     public void scheduleCountdowns(int delayMinutes) {
         if (!plugin.getConfigManager().isShowCountdownEnabled()) {
             return;
         }
         
-        // Cancel any existing countdown tasks
+
         cancelCountdowns();
         
-        // Schedule new countdown tasks
+
         for (int countdown : plugin.getConfigManager().getCountdownTimes()) {
             if (countdown < delayMinutes) {
-                int timeUntilNotification = (delayMinutes - countdown) * 60 * 20; // Convert to ticks
+                int timeUntilNotification = (delayMinutes - countdown) * 60 * 20;
                 
                 BukkitTask task = Bukkit.getScheduler().runTaskLater(plugin, () -> {
                     String message = plugin.getConfigManager().getMessage("countdown")
@@ -115,9 +92,7 @@ public class NotificationManager {
         }
     }
 
-    /**
-     * Cancel all scheduled countdown tasks
-     */
+
     public void cancelCountdowns() {
         for (BukkitTask task : countdownTasks.values()) {
             task.cancel();
@@ -126,11 +101,7 @@ public class NotificationManager {
         countdownTasks.clear();
     }
 
-    /**
-     * Send a message to a specific player
-     * @param player Player to send message to
-     * @param message Message to send
-     */
+
     public void sendPlayerMessage(Player player, String message) {
         if (player != null && message != null && !message.isEmpty()) {
             player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));

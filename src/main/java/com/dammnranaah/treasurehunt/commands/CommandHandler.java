@@ -47,11 +47,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         }
     }
 
-    /**
-     * Handle the start command
-     * @param sender Command sender
-     * @return true if the command was handled
-     */
+
     private boolean handleStartCommand(CommandSender sender) {
         if (!sender.hasPermission("treasurehunt.start")) {
             sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
@@ -64,7 +60,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         if (spawned > 0) {
             sender.sendMessage(ChatColor.GREEN + "Spawned " + spawned + " treasure chests!");
             
-            // Broadcast spawn message if enabled
+
             if (plugin.getConfigManager().isBroadcastSpawnEnabled()) {
                 plugin.getServer().broadcastMessage(plugin.getConfigManager().getMessage("spawn"));
             }
@@ -75,11 +71,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    /**
-     * Handle the stop command
-     * @param sender Command sender
-     * @return true if the command was handled
-     */
+
     private boolean handleStopCommand(CommandSender sender) {
         if (!sender.hasPermission("treasurehunt.stop")) {
             sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
@@ -91,7 +83,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
 
         sender.sendMessage(ChatColor.GREEN + "Removed " + removed + " treasure chests!");
         
-        // Broadcast despawn message if enabled
+
         if (plugin.getConfigManager().isBroadcastSpawnEnabled()) {
             plugin.getServer().broadcastMessage(plugin.getConfigManager().getMessage("chest-despawn"));
         }
@@ -99,24 +91,20 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    /**
-     * Handle the reload command
-     * @param sender Command sender
-     * @return true if the command was handled
-     */
+
     private boolean handleReloadCommand(CommandSender sender) {
         if (!sender.hasPermission("treasurehunt.reload")) {
             sender.sendMessage(ChatColor.RED + "You don't have permission to use this command.");
             return true;
         }
 
-        // Reload config
+
         plugin.getConfigManager().reloadConfig();
         
-        // Reload loot tables
+
         plugin.getLootManager().reloadLootTables();
         
-        // Restart spawn task if auto-spawn is enabled
+
         if (plugin.getConfigManager().isAutoSpawnEnabled()) {
             plugin.stopSpawnTask();
             plugin.startSpawnTask();
@@ -128,11 +116,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    /**
-     * Handle the locate command
-     * @param sender Command sender
-     * @return true if the command was handled
-     */
+
     private boolean handleLocateCommand(CommandSender sender) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(ChatColor.RED + "This command can only be used by players.");
@@ -146,7 +130,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        // Check cooldown
+
         int cooldown = plugin.getConfigManager().getLocateCooldown();
         if (cooldown > 0) {
             long lastUse = locateCooldowns.getOrDefault(player.getUniqueId(), 0L);
@@ -158,7 +142,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
             }
         }
 
-        // Find nearest chest
+
         TreasureChest nearest = plugin.getChestManager().getNearestChest(player);
 
         if (nearest == null) {
@@ -166,7 +150,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        // Calculate distance
+
         double distance = player.getLocation().distance(nearest.getLocation());
         String direction = LocationUtils.getCardinalDirection(player.getLocation(), nearest.getLocation());
         String biome = nearest.getLocation().getBlock().getBiome().name().toLowerCase().replace("_", " ");
@@ -179,14 +163,14 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
                 ChatColor.YELLOW + biome + 
                 ChatColor.GOLD + ".");
 
-        // Apply penalties if enabled
+
         if (plugin.getConfigManager().isLocatePenaltyEnabled()) {
-            // Mark the chest as "located" for reduced loot quality
+
             if (plugin.getConfigManager().reduceLocateLootQuality()) {
-                // This would be implemented in the chest interaction event
+
             }
 
-            // Broadcast usage if enabled
+
             if (plugin.getConfigManager().broadcastLocateUsage()) {
                 plugin.getServer().broadcastMessage(
                         ChatColor.GOLD + "[TreasureHunt] " + 
@@ -195,16 +179,13 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
             }
         }
 
-        // Set cooldown
+
         locateCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
 
         return true;
     }
 
-    /**
-     * Send help message to the sender
-     * @param sender Command sender
-     */
+
     private void sendHelpMessage(CommandSender sender) {
         sender.sendMessage(ChatColor.GOLD + "=== TreasureHunt Commands ===");
         
@@ -254,12 +235,7 @@ public class CommandHandler implements CommandExecutor, TabCompleter {
         return completions;
     }
 
-    /**
-     * Filter completions based on the current argument
-     * @param completions List of possible completions
-     * @param current Current argument
-     * @return Filtered list of completions
-     */
+
     private List<String> filterCompletions(List<String> completions, String current) {
         if (current.isEmpty()) {
             return completions;

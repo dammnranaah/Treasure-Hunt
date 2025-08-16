@@ -27,9 +27,7 @@ public class LootManager {
         loadLootTables();
     }
 
-    /**
-     * Load loot tables from config
-     */
+
     private void loadLootTables() {
         ConfigurationSection lootConfig = plugin.getConfig().getConfigurationSection("loot.items");
         if (lootConfig == null) {
@@ -37,7 +35,7 @@ public class LootManager {
             return;
         }
 
-        // Load each tier's loot table
+
         for (String tier : lootConfig.getKeys(false)) {
             List<LootItem> items = new ArrayList<>();
             ConfigurationSection tierSection = lootConfig.getConfigurationSection(tier);
@@ -67,7 +65,7 @@ public class LootManager {
                             
                             LootItem lootItem = new LootItem(material, minAmount, maxAmount, chance);
                             
-                            // Load enchantments if present
+
                             ConfigurationSection enchantmentsSection = itemSection.getConfigurationSection("enchantments");
                             if (enchantmentsSection != null) {
                                 for (String enchKey : enchantmentsSection.getKeys(false)) {
@@ -111,34 +109,30 @@ public class LootManager {
         }
     }
 
-    /**
-     * Fill a chest inventory with loot
-     * @param inventory Inventory to fill
-     * @param tier Tier of the chest
-     */
+
     public void fillChest(Inventory inventory, String tier) {
-        // Clear the inventory first
+
         inventory.clear();
         
-        // Get the loot table for the tier
+
         List<LootItem> lootTable = lootTables.get(tier.toLowerCase());
         if (lootTable == null || lootTable.isEmpty()) {
             plugin.getLogger().warning("No loot table found for tier: " + tier);
             return;
         }
         
-        // Get min/max items from config
+
         int minItems = plugin.getConfig().getInt("loot.tiers." + tier + ".min-items", 2);
         int maxItems = plugin.getConfig().getInt("loot.tiers." + tier + ".max-items", 5);
         
-        // Determine number of items to add
+
         int itemCount = ThreadLocalRandom.current().nextInt(minItems, maxItems + 1);
         
-        // Add random items from the loot table
+
         for (int i = 0; i < itemCount; i++) {
             ItemStack item = getRandomLoot(lootTable);
             if (item != null) {
-                // Find a random empty slot
+
                 int slot;
                 do {
                     slot = ThreadLocalRandom.current().nextInt(inventory.getSize());
@@ -148,30 +142,26 @@ public class LootManager {
             }
         }
         
-        // Add vanilla loot if enabled
+
         if (plugin.getConfig().getBoolean("loot.use-vanilla-loot", true)) {
             addVanillaLoot(inventory, tier);
         }
     }
 
-    /**
-     * Get a random item from a loot table
-     * @param lootTable Loot table to choose from
-     * @return Random item or null if none selected
-     */
+
     private ItemStack getRandomLoot(List<LootItem> lootTable) {
-        // Calculate total weight
+
         int totalWeight = 0;
         for (LootItem item : lootTable) {
             totalWeight += item.getChance();
         }
         
-        // No valid items
+
         if (totalWeight <= 0) {
             return null;
         }
         
-        // Select a random item based on weight
+
         int random = ThreadLocalRandom.current().nextInt(totalWeight);
         int currentWeight = 0;
         
@@ -185,15 +175,11 @@ public class LootManager {
         return null;
     }
 
-    /**
-     * Add vanilla loot to a chest
-     * @param inventory Inventory to add loot to
-     * @param tier Tier of the chest
-     */
+
     private void addVanillaLoot(Inventory inventory, String tier) {
         LootTable lootTable = null;
         
-        // Select a loot table based on tier
+
         switch (tier.toLowerCase()) {
             case "common":
                 lootTable = getRandomLootTable(Arrays.asList(
@@ -225,16 +211,15 @@ public class LootManager {
                 break;
         }
         
-        // Add loot from the selected table
+
         if (lootTable != null) {
-            // This would normally use the loot table API, but it's complex to implement here
-            // For now, we'll just add a placeholder item
+
             ItemStack placeholder = new ItemStack(Material.BOOK);
             ItemMeta meta = placeholder.getItemMeta();
             meta.setDisplayName("Treasure");
             placeholder.setItemMeta(meta);
             
-            // Find a random empty slot
+
             int slot;
             do {
                 slot = ThreadLocalRandom.current().nextInt(inventory.getSize());
@@ -244,11 +229,7 @@ public class LootManager {
         }
     }
     
-    /**
-     * Get a random loot table from a list
-     * @param lootTables List of loot tables
-     * @return Random loot table
-     */
+
     private LootTable getRandomLootTable(List<LootTables> lootTables) {
         if (lootTables.isEmpty()) {
             return null;
@@ -258,17 +239,13 @@ public class LootManager {
         return randomTable.getLootTable();
     }
     
-    /**
-     * Reload loot tables from config
-     */
+
     public void reloadLootTables() {
         lootTables.clear();
         loadLootTables();
     }
     
-    /**
-     * Inner class to represent a loot item
-     */
+
     private class LootItem {
         private final Material material;
         private final int minAmount;
@@ -296,16 +273,16 @@ public class LootManager {
             int amount = ThreadLocalRandom.current().nextInt(minAmount, maxAmount + 1);
             ItemStack item = new ItemStack(material, amount);
             
-            // Add enchantments if applicable
+
             if (!enchantments.isEmpty() && material != Material.AIR) {
                 for (EnchantmentInfo enchInfo : enchantments) {
-                    // Check if enchantment should be applied based on chance
+
                     if (ThreadLocalRandom.current().nextInt(100) < enchInfo.getChance()) {
                         int level = ThreadLocalRandom.current().nextInt(
                                 enchInfo.getMinLevel(), 
                                 enchInfo.getMaxLevel() + 1);
                         
-                        // Special handling for enchanted books
+
                         if (material == Material.ENCHANTED_BOOK) {
                             EnchantmentStorageMeta meta = (EnchantmentStorageMeta) item.getItemMeta();
                             meta.addStoredEnchant(enchInfo.getEnchantment(), level, true);
@@ -321,9 +298,7 @@ public class LootManager {
         }
     }
     
-    /**
-     * Inner class to represent enchantment information
-     */
+
     private class EnchantmentInfo {
         private final Enchantment enchantment;
         private final int minLevel;

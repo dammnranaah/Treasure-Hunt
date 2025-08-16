@@ -1,6 +1,21 @@
 package com.dammnranaah.treasurehunt;
 
-import com.dammnranaah.treasurehunt.commands.CommandHandler;
+impo    @Override
+    public void onDisable() {
+        if (configManager != null) {
+            configManager.saveConfig();
+        }
+        
+        if (spawnTask != null) {
+            spawnTask.cancel();
+        }
+        
+        if (notificationManager != null) {
+            notificationManager.cancelAllNotifications();
+        }
+        
+        getLogger().info("TreasureHunt has been disabled!");
+    }treasurehunt.commands.CommandHandler;
 import com.dammnranaah.treasurehunt.config.ConfigManager;
 import com.dammnranaah.treasurehunt.listeners.ChestListener;
 import com.dammnranaah.treasurehunt.managers.ChestManager;
@@ -21,25 +36,19 @@ public final class TreasureHunt extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Set instance
         instance = this;
         
-        // Initialize config
         configManager = new ConfigManager(this);
         configManager.loadConfig();
         
-        // Initialize managers
         chestManager = new ChestManager(this);
         lootManager = new LootManager(this);
         notificationManager = new NotificationManager(this);
         
-        // Register events
         getServer().getPluginManager().registerEvents(new ChestListener(this), this);
         
-        // Register commands
         getCommand("treasurehunt").setExecutor(new CommandHandler(this));
         
-        // Start scheduled tasks if auto-spawn is enabled
         if (configManager.isAutoSpawnEnabled()) {
             startSpawnTask();
         }
@@ -49,17 +58,14 @@ public final class TreasureHunt extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        // Save data
         if (chestManager != null) {
             chestManager.saveChests();
         }
         
-        // Cancel tasks
         if (spawnTask != null) {
             spawnTask.cancel();
         }
         
-        // Cancel notifications
         if (notificationManager != null) {
             notificationManager.cancelCountdowns();
         }
@@ -67,15 +73,12 @@ public final class TreasureHunt extends JavaPlugin {
         getLogger().info("TreasureHunt has been disabled!");
     }
     
-    /**
-     * Start the automatic chest spawn task
-     */
     public void startSpawnTask() {
         if (spawnTask != null) {
             spawnTask.cancel();
         }
         
-        int interval = configManager.getSpawnInterval() * 20 * 60; // Convert minutes to ticks
+        int interval = configManager.getSpawnInterval() * 20 * 60;
         spawnTask = new ChestSpawnTask(this);
         spawnTask.runTaskTimer(this, interval, interval);
         
@@ -83,9 +86,6 @@ public final class TreasureHunt extends JavaPlugin {
                 configManager.getSpawnInterval() + " minutes");
     }
     
-    /**
-     * Stop the automatic chest spawn task
-     */
     public void stopSpawnTask() {
         if (spawnTask != null) {
             spawnTask.cancel();
@@ -94,42 +94,22 @@ public final class TreasureHunt extends JavaPlugin {
         }
     }
     
-    /**
-     * Get the instance of the plugin
-     * @return Plugin instance
-     */
     public static TreasureHunt getInstance() {
         return instance;
     }
     
-    /**
-     * Get the config manager
-     * @return ConfigManager instance
-     */
     public ConfigManager getConfigManager() {
         return configManager;
     }
     
-    /**
-     * Get the chest manager
-     * @return ChestManager instance
-     */
     public ChestManager getChestManager() {
         return chestManager;
     }
     
-    /**
-     * Get the loot manager
-     * @return LootManager instance
-     */
     public LootManager getLootManager() {
         return lootManager;
     }
     
-    /**
-     * Get the notification manager
-     * @return NotificationManager instance
-     */
     public NotificationManager getNotificationManager() {
         return notificationManager;
     }
